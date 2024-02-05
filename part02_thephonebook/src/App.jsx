@@ -18,13 +18,23 @@ const App = () => {
 
   const submitName = (event) => {
     event.preventDefault();
+    
     const newPerson = {
       name: newName
     };
+    
+    if (isPersonInThePhonebook(newPerson)) {
+      alert(`${newPerson.name} already exists in the phonebook`);
+    } else {
+      setPersons(persons.concat(newPerson));
+    }
 
-    setPersons(persons.concat(newPerson));
     setNewName('');
   }
+
+  const isPersonInThePhonebook = (newPerson) => {
+    return persons.find(person => JSON.stringify(person) === JSON.stringify(newPerson));
+  };
 
   return (
     <div>
