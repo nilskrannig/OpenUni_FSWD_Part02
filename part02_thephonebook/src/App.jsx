@@ -57,8 +57,10 @@ const App = () => {
   const updateFilter = (event) => setFilter(event.target.value);
 
   const handleDelete = id => {
-    personService.deleteEntry(id)
-      .then(() => setPersons(persons.filter(person => person.id != id)))
+    if (window.confirm(`Delete ${id}`)) {
+      personService.deleteEntry(id)
+        .then(() => setPersons(persons.filter(person => person.id != id)))
+    }
   }
 
   return (
