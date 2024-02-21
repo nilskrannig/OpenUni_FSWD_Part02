@@ -2,16 +2,15 @@ import { useEffect, useState } from 'react'
 import { Persons } from './components/Persons'
 import { PersonForm } from './components/PersonForm'
 import personService from './services/persons'
-
-const Filter = ({ text, updateFilter }) => {
-  return <div>{text}<input onChange={updateFilter} /></div>
-}
+import { Filter } from './components/Filter'
+import { Notification } from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
   useEffect(() => {
     personService.getAllPersons().then(allPersons => {
@@ -40,6 +39,10 @@ const App = () => {
     if (!alreadyInPhonebookPerson) {
       personService.create(newPerson).then(createdPerson => {
         setPersons(persons.concat(createdPerson));
+        setNotificationMessage(`Added ${createdPerson.name} successfully`)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
       })
       resetPersonInputs()
       return;
@@ -50,6 +53,10 @@ const App = () => {
       personService.updatePerson(alreadyInPhonebookPerson.id, changedPerson).then(updatedPerson => {
         setPersons(persons.map(person => person.id != updatedPerson.id ? person : updatedPerson))
         resetPersonInputs()
+        setNotificationMessage(`Changed number of ${updatedPerson.name} successfully`)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
       })
     }
   }
@@ -80,6 +87,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
       <Filter text={"filter with: "} updateFilter={updateFilter} />
       <PersonForm
         handleNameChange={handleNameChange}
