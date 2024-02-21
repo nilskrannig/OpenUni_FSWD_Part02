@@ -35,19 +35,32 @@ const App = () => {
       number: newNumber
     };
 
-    if (isPersonInThePhonebook(newPerson)) {
-      alert(`${newPerson.name} already exists in the phonebook`);
-    } else {
+    const alreadyInPhonebookPerson = getPersonFromPhonebookByName(newPerson.name)
+
+    if (!alreadyInPhonebookPerson) {
       personService.create(newPerson).then(createdPerson => {
         setPersons(persons.concat(createdPerson));
-        setNewName('');
-        setNewNumber('');
+      })
+      resetPersonInputs()
+      return;
+    }
+
+    if (window.confirm(`${newPerson.name} is already added to the phonebook. Would you like to replace the old number with the new one?`)) {
+      const changedPerson = { ...alreadyInPhonebookPerson, number: newPerson.number }
+      personService.updatePerson(alreadyInPhonebookPerson.id, changedPerson).then(updatedPerson => {
+        setPersons(persons.map(person => person.id != updatedPerson.id ? person : updatedPerson))
+        resetPersonInputs()
       })
     }
   }
 
-  const isPersonInThePhonebook = (newPerson) => {
-    return persons.find(person => JSON.stringify(person.name) === JSON.stringify(newPerson.name));
+  const resetPersonInputs = () => {
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const getPersonFromPhonebookByName = (name) => {
+    return persons.find(person => JSON.stringify(person.name) === JSON.stringify(name));
   };
 
   const filteredPersons = filter ? persons.filter((person) => {
@@ -57,7 +70,8 @@ const App = () => {
   const updateFilter = (event) => setFilter(event.target.value);
 
   const handleDelete = id => {
-    if (window.confirm(`Delete ${id}`)) {
+    const personToDelete = persons.find(person => person.id === id)
+    if (window.confirm(`Delete ${personToDelete.name}`)) {
       personService.deleteEntry(id)
         .then(() => setPersons(persons.filter(person => person.id != id)))
     }

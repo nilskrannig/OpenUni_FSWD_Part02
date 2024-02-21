@@ -21,4 +21,11 @@ const deleteEntry = id => {
         .catch(error => console.log(`Couldn't delete person with id ${id}`, error))
 }
 
-export default { create, getAllPersons, deleteEntry }
+const updatePerson = (id, changedPerson) => {
+    const url = baseUrl.concat(`/${id}`)
+    return axios.put(url, changedPerson)
+        .then(res => res.data)
+        .catch(err => console.log(err))
+}
+
+export default { create, getAllPersons, deleteEntry, updatePerson }
