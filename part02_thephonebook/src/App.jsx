@@ -38,11 +38,12 @@ const App = () => {
     if (isPersonInThePhonebook(newPerson)) {
       alert(`${newPerson.name} already exists in the phonebook`);
     } else {
-      setPersons(persons.concat(newPerson));
+      axios.post('http://localhost:3001/persons', newPerson).then(response => {
+        setPersons(persons.concat(newPerson));
+        setNewName('');
+        setNewNumber('');
+      })
     }
-
-    setNewName('');
-    setNewNumber('');
   }
 
   const isPersonInThePhonebook = (newPerson) => {
