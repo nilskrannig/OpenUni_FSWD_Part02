@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
+  const [isNotificationError, setIsNotificationError] = useState(false)
 
   useEffect(() => {
     personService.getAllPersons().then(allPersons => {
@@ -37,27 +38,43 @@ const App = () => {
     const alreadyInPhonebookPerson = getPersonFromPhonebookByName(newPerson.name)
 
     if (!alreadyInPhonebookPerson) {
-      personService.create(newPerson).then(createdPerson => {
-        setPersons(persons.concat(createdPerson));
-        setNotificationMessage(`Added ${createdPerson.name} successfully`)
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 5000)
-      })
+      personService
+        .create(newPerson)
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson));
+          setIsNotificationError(false)
+          setNotificationMessage(`Added ${createdPerson.name} successfully`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
       resetPersonInputs()
       return;
     }
 
     if (window.confirm(`${newPerson.name} is already added to the phonebook. Would you like to replace the old number with the new one?`)) {
       const changedPerson = { ...alreadyInPhonebookPerson, number: newPerson.number }
-      personService.updatePerson(alreadyInPhonebookPerson.id, changedPerson).then(updatedPerson => {
-        setPersons(persons.map(person => person.id != updatedPerson.id ? person : updatedPerson))
-        resetPersonInputs()
-        setNotificationMessage(`Changed number of ${updatedPerson.name} successfully`)
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 5000)
-      })
+      personService
+        .updatePerson(alreadyInPhonebookPerson.id, changedPerson)
+        .then(updatedPerson => {
+          setPersons(persons.map(person => person.id != updatedPerson.id ? person : updatedPerson))
+          resetPersonInputs()
+          setIsNotificationError(false)
+          setNotificationMessage(`Changed number of ${updatedPerson.name} successfully`)
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          if (error.response?.status === 404) {
+            setIsNotificationError(true)
+            setNotificationMessage(`Information of ${changedPerson.name} has already been removed from the server`)
+            setPersons(persons.filter(person => person.id != changedPerson.id))
+            setTimeout(() => {
+              setNotificationMessage(null)
+            }, 5000)
+          }
+        })
     }
   }
 
@@ -87,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} isError={isNotificationError}/>
       <Filter text={"filter with: "} updateFilter={updateFilter} />
       <PersonForm
         handleNameChange={handleNameChange}
