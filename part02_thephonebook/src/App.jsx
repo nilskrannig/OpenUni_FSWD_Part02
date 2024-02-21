@@ -56,10 +56,14 @@ const App = () => {
 
   const updateFilter = (event) => setFilter(event.target.value);
 
+  const handleDelete = id => {
+    personService.deleteEntry(id)
+      .then(() => setPersons(persons.filter(person => person.id != id)))
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
-      {/* <div>filter with<input onChange={updateFilter} /></div> */}
       <Filter text={"filter with: "} updateFilter={updateFilter} />
       <PersonForm
         handleNameChange={handleNameChange}
@@ -68,7 +72,7 @@ const App = () => {
         newNumber={newNumber}
         onSubmit={onSubmit} />
       <h2>Numbers</h2>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} buttonText={'delete'} deleteEntry={handleDelete} />
     </div>
   )
 }
