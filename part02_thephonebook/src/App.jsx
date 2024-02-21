@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Persons } from './components/Persons'
 import { PersonForm } from './components/PersonForm'
-import axios from 'axios'
+import personService from './services/persons'
 
 const Filter = ({ text, updateFilter }) => {
   return <div>{text}<input onChange={updateFilter} /></div>
@@ -14,8 +14,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data)
+    personService.getAllPersons().then(allPersons => {
+      setPersons(allPersons)
     })
   }, [])
 
@@ -38,8 +38,8 @@ const App = () => {
     if (isPersonInThePhonebook(newPerson)) {
       alert(`${newPerson.name} already exists in the phonebook`);
     } else {
-      axios.post('http://localhost:3001/persons', newPerson).then(response => {
-        setPersons(persons.concat(newPerson));
+      personService.create(newPerson).then(createdPerson => {
+        setPersons(persons.concat(createdPerson));
         setNewName('');
         setNewNumber('');
       })
@@ -47,7 +47,7 @@ const App = () => {
   }
 
   const isPersonInThePhonebook = (newPerson) => {
-    return persons.find(person => JSON.stringify(person) === JSON.stringify(newPerson));
+    return persons.find(person => JSON.stringify(person.name) === JSON.stringify(newPerson.name));
   };
 
   const filteredPersons = filter ? persons.filter((person) => {
