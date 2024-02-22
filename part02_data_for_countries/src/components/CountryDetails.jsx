@@ -10,7 +10,7 @@ export const CountryDetails = ({ country }) => {
       area: {country.area}
     </p>
 
-    <h3>languages:</h3>
+    <h3>Languages:</h3>
     <ul>
       {Object.entries(languages).map((lang) => {
         return <li key={lang[0]}>{lang[1]}</li>;

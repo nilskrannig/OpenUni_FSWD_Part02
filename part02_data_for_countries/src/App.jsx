@@ -32,6 +32,7 @@ const App = () => {
 
   return (
     <div>
+      <h1>Country Information Page</h1>
       <form onSubmit={searchCountry}>
         <input value={searchValue} onChange={handleSearchChange} />
       </form>

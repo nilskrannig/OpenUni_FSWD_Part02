@@ -1,4 +1,5 @@
 import { CountryDetails } from "./CountryDetails";
+import { WeatherDetails } from "./WeatherDetails";
 
 export const SearchResult = ({ countries, onClick }) => {
   if (countries.length > 10) return (<div>Too many matches, specify another filter</div>);
@@ -21,7 +22,10 @@ export const SearchResult = ({ countries, onClick }) => {
     const country = countries[0];
 
     return (
-      <CountryDetails country={country} />
+      <>
+        <CountryDetails country={country} />
+        <WeatherDetails country={country} />
+      </>
     );
   }
 };
